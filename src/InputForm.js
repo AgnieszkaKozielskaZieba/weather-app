@@ -1,38 +1,56 @@
 import React,{Component} from "react"
+import CityInputForm from "./CityInputForm"
+import CountryInputForm from "./CountryInputForm"
 
 class InputForm extends Component{
 	constructor(props){
 		super(props)
 		this.state={
+			cities:[],
+			selCities:null,
 			cityInput:"",
-			countryInput:""
+			cityID:null
 		}
-		this.handleChange=this.handleChange.bind(this)
-		this.handleSubmit=this.handleSubmit.bind(this)
+		// this.handleChange=this.handleChange.bind(this)
+		this.handleCitySubmit=this.handleCitySubmit.bind(this)
+		this.handleCityID=this.handleCityID.bind(this)
 	}
 
-	handleChange(e){
-		e.preventDefault()
-		this.setState({[e.target.name]:e.target.value})
+	componentDidMount(){
+		let cities=require("./cities_full.json")
+		this.setState({...this.state, cities})
 	}
 
-	handleSubmit(e){
-		e.preventDefault()
-		e.target.reset()
-		let city=this.state.cityInput
-		let country=this.state.countryInput
-		this.props.onSubmit(city,country)
+	async handleCitySubmit(cityInput){
+		await this.setState({cityInput})
+		let selCities=this.state.cities.filter(c=>c.city_name===this.state.cityInput)
+		if (selCities.length>0){
+			let cityID=selCities[0].id
+			this.setState({cityID})
+		}
+		this.setState({selCities})
+	}
+
+	handleCityID(cityID){
+		this.setState({cityID})
 	}
 
 	render(){
+		var possibleCountries=null
+		var confirmButton=null
+		if(this.state.selCities){
+			possibleCountries=<p>Sorry, I don't know this city.</p>;
+			if(this.state.selCities.length>0){
+				possibleCountries=<CountryInputForm onChange={this.handleCityID} selCities={this.state.selCities}/>
+				confirmButton=<button onClick={()=>this.props.onSubmit(this.state.cityID)}>Get weather!</button>
+		}
+		}
 		return(
-			<form onSubmit={this.handleSubmit}>
-		      <label htmlFor="cityInput">City</label>
-		      <input type="text" id="cityInput" name="cityInput" onChange={this.handleChange}/>
-		      <label htmlFor="countryInput">Country</label>
-		      <input type="text" id="countryInput" name="countryInput" onChange={this.handleChange}/>
-		      <button type="submit">Get weather!</button>
-		    </form>
+			<div>
+			<CityInputForm onSubmit={this.handleCitySubmit}/>
+			{possibleCountries}
+			{confirmButton}
+			</div>
 			)
 	}
 }
