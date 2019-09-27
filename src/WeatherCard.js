@@ -7,19 +7,17 @@ class WeatherCard extends Component{
 			max_temp,min_temp,app_max_temp,app_min_temp,
 			pop,precip,snow,weather,clouds}=this.props.weatherData
 		return(<div className="WeatherCard">
+			<h4 className="date">{valid_date}</h4>
 			<img src={`https://www.weatherbit.io/static/img/icons/${weather.icon}.png`} alt=""/>
-			<p>{valid_date}</p>
-			<p>Wind speed: {wind_spd}</p>
-			<p>Wind direction: {wind_dir}</p>
-			<p>Avarage temperature: {temp}</p>
-			<p>Max temperature: {max_temp}</p>
-			<p>Min temperature: {min_temp}</p>
-			<p>Feels like max temperature: {app_max_temp}</p>
-			<p>Feels like min temperature: {app_min_temp}</p>
-			<p>Probability of Precipitation: {pop}%</p>
-			<p>Accumulated liquid equivalent precipitation: {precip}</p>
-			<p>Snow: {snow}</p>
-			<p>Clouds: {clouds}</p>
+			<h1 className="maintemp">{temp} °C</h1>
+			<p className="temp">{min_temp}°C - {max_temp}°C</p>
+			<p>Wind speed: {Math.round(+wind_spd*3.6)} km/h</p>
+			<div className="precip">
+			<p>Precipitation: {pop}%</p>
+			<p>Rain: {Math.round(precip*10)/10} mm</p>
+			<p>Snow: {Math.round(snow*10)/10} mm</p>
+			</div>
+			<p>Clouds: {clouds}%</p>
 			</div>)
 	}
 }

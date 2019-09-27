@@ -1,19 +1,18 @@
 import React,{Component} from "react"
-import CityInputForm from "./CityInputForm"
-import CountryInputForm from "./CountryInputForm"
+import "./InputForm.css"
 
 class InputForm extends Component{
 	constructor(props){
 		super(props)
 		this.state={
 			cities:[],
-			selCities:null,
+			selCities:[],
 			cityInput:"",
 			cityID:null
 		}
-		// this.handleChange=this.handleChange.bind(this)
-		this.handleCitySubmit=this.handleCitySubmit.bind(this)
-		this.handleCityID=this.handleCityID.bind(this)
+		this.handleSubmit=this.handleSubmit.bind(this)
+		this.handleCityInput=this.handleCityInput.bind(this)
+		this.handleCountryChange=this.handleCountryChange.bind(this)
 	}
 
 	componentDidMount(){
@@ -21,36 +20,60 @@ class InputForm extends Component{
 		this.setState({...this.state, cities})
 	}
 
-	async handleCitySubmit(cityInput){
-		await this.setState({cityInput})
-		let selCities=this.state.cities.filter(c=>c.city_name===this.state.cityInput)
-		if (selCities.length>0){
-			let cityID=selCities[0].id
-			this.setState({cityID})
-		}
-		this.setState({selCities})
+	handleSubmit(e){
+		e.preventDefault()
+		this.props.onSubmit(this.state.cityID)
+		this.setState({selCities:[],cityInput:"",cityID:null})
+		e.target.reset()
 	}
 
-	handleCityID(cityID){
-		this.setState({cityID})
+	async handleCityInput(e){
+		e.preventDefault()
+		await this.setState({[e.target.name]:e.target.value})
+		if(this.state.cities.some(c=>c.city_name.toUpperCase()===this.state.cityInput.toUpperCase())){
+			let selCities=this.state.cities.filter(c=>c.city_name.toUpperCase()===this.state.cityInput.toUpperCase())
+			let cityID=selCities[0].id
+			this.setState({selCities,cityID})
+		}
+
+	}
+
+	handleCountryChange(e){
+		e.preventDefault()
+		this.setState({cityID:e.target.options[e.target.selectedIndex].value})
 	}
 
 	render(){
-		var possibleCountries=null
-		var confirmButton=null
-		if(this.state.selCities){
-			possibleCountries=<p>Sorry, I don't know this city.</p>;
-			if(this.state.selCities.length>0){
-				possibleCountries=<CountryInputForm onChange={this.handleCityID} selCities={this.state.selCities}/>
-				confirmButton=<button onClick={()=>this.props.onSubmit(this.state.cityID)}>Get weather!</button>
+		var possibleCountries=<option>---</option>
+		if (this.state.selCities.length>0){
+			possibleCountries=this.state.selCities.map((c,i)=><option key={i} value={c.id}>{c.country_code}, {c.state_name}</option>)
 		}
+
+		var possibleCitiesOptions=null
+		if(this.state.cityInput.length>0){
+			let possibleCities=this.state.cities.filter(c=>c.city_name.toUpperCase().startsWith(this.state.cityInput.toUpperCase()))
+			let citiesSet=new Set(possibleCities.map(c=>c.city_name).sort().slice(0,50))
+			possibleCitiesOptions=[...citiesSet].map((c,i)=><option key={i}>{c}</option>)		
 		}
+
 		return(
-			<div>
-			<CityInputForm onSubmit={this.handleCitySubmit}/>
-			{possibleCountries}
-			{confirmButton}
-			</div>
+			
+			<form onSubmit={this.handleSubmit}>
+				<div className="inputField">
+				<label htmlFor="cityInput">City</label>
+				<input type="text" list="cities" name="cityInput" value={this.state.cityInput} onChange={this.handleCityInput}/>
+				<datalist id="cities">
+				{possibleCitiesOptions}
+				</datalist>
+				</div>
+				<div className="inputField">
+				<label htmlFor="countryInput">Country</label>
+				<select name="countryInput" onChange={this.handleCountryChange}>
+				{possibleCountries}
+				</select>
+				</div>
+				<button type="submit">Get weather!</button>
+			</form>
 			)
 	}
 }
