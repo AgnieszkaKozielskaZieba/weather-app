@@ -1,81 +1,113 @@
-import React,{Component} from "react"
-import "./InputForm.css"
+import React, { Component } from "react";
+import "./InputForm.css";
 
-class InputForm extends Component{
-	constructor(props){
-		super(props)
-		this.state={
-			cities:[],
-			selCities:[],
-			cityInput:"",
-			cityID:null
+class InputForm extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			cities: [],
+			selCities: [],
+			cityInput: "",
+			cityID: null
+		};
+		this.handleSubmit = this.handleSubmit.bind(this);
+		this.handleCityInput = this.handleCityInput.bind(this);
+		this.handleCountryChange = this.handleCountryChange.bind(this);
+	}
+
+	componentDidMount() {
+		let cities = require("./cities_full.json");
+		this.setState({ ...this.state, cities });
+	}
+
+	handleSubmit(e) {
+		e.preventDefault();
+		this.props.onSubmit(this.state.cityID);
+		this.setState({ selCities: [], cityInput: "", cityID: null });
+		e.target.reset();
+	}
+
+	async handleCityInput(e) {
+		e.preventDefault();
+		await this.setState({ [e.target.name]: e.target.value });
+		if (
+			this.state.cities.some(
+				c =>
+					c.city_name.toUpperCase() ===
+					this.state.cityInput.toUpperCase()
+			)
+		) {
+			let selCities = this.state.cities.filter(
+				c =>
+					c.city_name.toUpperCase() ===
+					this.state.cityInput.toUpperCase()
+			);
+			let cityID = selCities[0].id;
+			this.setState({ selCities, cityID });
 		}
-		this.handleSubmit=this.handleSubmit.bind(this)
-		this.handleCityInput=this.handleCityInput.bind(this)
-		this.handleCountryChange=this.handleCountryChange.bind(this)
 	}
 
-	componentDidMount(){
-		let cities=require("./cities_full.json")
-		this.setState({...this.state, cities})
+	handleCountryChange(e) {
+		e.preventDefault();
+		this.setState({
+			cityID: e.target.options[e.target.selectedIndex].value
+		});
 	}
 
-	handleSubmit(e){
-		e.preventDefault()
-		this.props.onSubmit(this.state.cityID)
-		this.setState({selCities:[],cityInput:"",cityID:null})
-		e.target.reset()
-	}
-
-	async handleCityInput(e){
-		e.preventDefault()
-		await this.setState({[e.target.name]:e.target.value})
-		if(this.state.cities.some(c=>c.city_name.toUpperCase()===this.state.cityInput.toUpperCase())){
-			let selCities=this.state.cities.filter(c=>c.city_name.toUpperCase()===this.state.cityInput.toUpperCase())
-			let cityID=selCities[0].id
-			this.setState({selCities,cityID})
+	render() {
+		var possibleCountries = <option>---</option>;
+		if (this.state.selCities.length > 0) {
+			possibleCountries = this.state.selCities.map((c, i) => (
+				<option key={i} value={c.id}>
+					{c.country_code}, {c.state_name}
+				</option>
+			));
 		}
 
-	}
-
-	handleCountryChange(e){
-		e.preventDefault()
-		this.setState({cityID:e.target.options[e.target.selectedIndex].value})
-	}
-
-	render(){
-		var possibleCountries=<option>---</option>
-		if (this.state.selCities.length>0){
-			possibleCountries=this.state.selCities.map((c,i)=><option key={i} value={c.id}>{c.country_code}, {c.state_name}</option>)
+		var possibleCitiesOptions = null;
+		if (this.state.cityInput.length > 0) {
+			let possibleCities = this.state.cities.filter(c =>
+				c.city_name
+					.toUpperCase()
+					.startsWith(this.state.cityInput.toUpperCase())
+			);
+			let citiesSet = new Set(
+				possibleCities
+					.map(c => c.city_name)
+					.sort()
+					.slice(0, 50)
+			);
+			possibleCitiesOptions = [...citiesSet].map((c, i) => (
+				<option key={i}>{c}</option>
+			));
 		}
 
-		var possibleCitiesOptions=null
-		if(this.state.cityInput.length>0){
-			let possibleCities=this.state.cities.filter(c=>c.city_name.toUpperCase().startsWith(this.state.cityInput.toUpperCase()))
-			let citiesSet=new Set(possibleCities.map(c=>c.city_name).sort().slice(0,50))
-			possibleCitiesOptions=[...citiesSet].map((c,i)=><option key={i}>{c}</option>)		
-		}
-
-		return(
-			
+		return (
 			<form onSubmit={this.handleSubmit}>
 				<div className="inputField">
-				<label htmlFor="cityInput">City</label>
-				<input type="text" list="cities" name="cityInput" value={this.state.cityInput} onChange={this.handleCityInput}/>
-				<datalist id="cities">
-				{possibleCitiesOptions}
-				</datalist>
+					<label htmlFor="cityInput">City</label>
+					<input
+						type="text"
+						list="cities"
+						name="cityInput"
+						value={this.state.cityInput}
+						onChange={this.handleCityInput}
+					/>
+					<datalist id="cities">{possibleCitiesOptions}</datalist>
 				</div>
 				<div className="inputField">
-				<label htmlFor="countryInput">Country</label>
-				<select name="countryInput" onChange={this.handleCountryChange}>
-				{possibleCountries}
-				</select>
+					<label htmlFor="countryInput">Country</label>
+					<select
+						name="countryInput"
+						onChange={this.handleCountryChange}
+					>
+						{possibleCountries}
+					</select>
 				</div>
 				<button type="submit">Get weather!</button>
 			</form>
-			)
+		);
 	}
 }
 
-export default InputForm
+export default InputForm;

@@ -1,8 +1,8 @@
-.WeatherDisplay{
+.WeatherDisplay {
 	display: flex;
 	flex-wrap: wrap;
 	padding: 0 30px;
 }
-h1{
-	width:100%;
+h1 {
+	width: 100%;
 }
