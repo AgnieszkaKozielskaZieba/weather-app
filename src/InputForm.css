@@ -10,7 +10,7 @@ form {
 	display: block;
 }
 
-p {
+.orP {
 	display: inline-block;
 	text-align: center;
 	width: 100px;
@@ -25,7 +25,7 @@ p {
 	form {
 		display: inline-block;
 	}
-	p {
+	.orP {
 		width: 20px;
 	}
 }

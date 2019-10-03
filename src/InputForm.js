@@ -51,21 +51,21 @@ class InputForm extends Component {
 	}
 
 	render() {
-		let locationButton = null;
-		if ("geolocation" in navigator) {
-			locationButton = (
-				<form className="locationField">
-					<div className="inputField">
-						<button onClick={this.handleCoordsSubmit}>My location</button>
-					</div>
-					<div className="inputField">
-						<p>OR</p>
-					</div>
-				</form>
-			);
-		} else {
-			console.log("no geolocation");
-		}
+		// let locationButton = null;
+		// if ("geolocation" in navigator) {
+		// 	locationButton = (
+		// 		<form className="locationField">
+		// 			<div className="inputField">
+		// 				<button onClick={this.handleCoordsSubmit}>My location</button>
+		// 			</div>
+		// 			<div className="inputField">
+		// 				<p className="orP">OR</p>
+		// 			</div>
+		// 		</form>
+		// 	);
+		// } else {
+		// 	console.log("no geolocation");
+		// }
 
 		var possibleCountries = <option>---</option>;
 		if (this.state.selCities.length > 0) {
@@ -90,7 +90,6 @@ class InputForm extends Component {
 
 		return (
 			<header>
-				{locationButton}
 				<form onSubmit={this.handleSubmit}>
 					<div className="inputField">
 						<label htmlFor="cityInput">City</label>
