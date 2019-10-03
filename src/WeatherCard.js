@@ -3,28 +3,11 @@ import "./WeatherCard.css";
 
 class WeatherCard extends Component {
 	render() {
-		let {
-			valid_date,
-			wind_spd,
-			wind_dir,
-			temp,
-			max_temp,
-			min_temp,
-			app_max_temp,
-			app_min_temp,
-			pop,
-			precip,
-			snow,
-			weather,
-			clouds
-		} = this.props.weatherData;
+		let { valid_date, wind_spd, temp, max_temp, min_temp, pop, precip, snow, weather, clouds } = this.props.weatherData;
 		return (
 			<div className="WeatherCard">
 				<h4 className="date">{valid_date}</h4>
-				<img
-					src={`https://www.weatherbit.io/static/img/icons/${weather.icon}.png`}
-					alt=""
-				/>
+				<img src={`https://www.weatherbit.io/static/img/icons/${weather.icon}.png`} alt="" />
 				<h1 className="maintemp">{temp} °C</h1>
 				<p className="temp">
 					{min_temp}°C - {max_temp}°C
